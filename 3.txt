@@ -1,0 +1,130 @@
+using System;
+
+class Program
+{
+    static int tamañoX = 25; // Tamaño horizontal del tablero
+    static int tamañoY = 25; // Tamaño vertical del tablero
+    static int posicionX = tamañoX / 2; // Posición inicial X de la serpiente
+    static int posicionY = tamañoY / 2; // Posición inicial Y de la serpiente
+    static int puntoPosicionX = tamañoX / 2; // Posición X del punto que contiene el "+"
+    static int puntoPosicionY = tamañoY / 2; // Posición Y del punto que contiene el "+"
+    static int directionX = 1; // Dirección inicial X de la serpiente (1: derecha, -1: izquierda)
+    static int directionY = 0; // Dirección inicial Y de la serpiente (1: abajo, -1: arriba)
+    static int snakeLength = 1; // Longitud inicial de la serpiente
+
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Bienvenido a Snake!");
+        Console.WriteLine("Utiliza las teclas A, D, W y S para mover la serpiente.");
+        Console.WriteLine("Presiona Q para salir.");
+        Console.ReadKey();
+        // Bucle principal del juego
+        while (true)
+        {
+            DibujarTablero();
+            MoverSerpiente();
+            InteractuarUsuario();
+            System.Threading.Thread.Sleep(509); // Esperar un tiempo para simular la velocidad del juego
+        }
+    }
+
+    static List<int> cola = new List<int>(); // Cola de la serpiente
+    static void DibujarTablero()
+    {
+        Console.Clear();
+        for (int y = 0; y < tamañoY; y++)
+        {
+            for (int x = 0; x < tamañoX; x++)
+            {
+                if (x == puntoPosicionX && y == puntoPosicionY)
+                {
+                    Console.Write("+");
+                }
+                else if (x == posicionX && y == posicionY)
+                {
+                    Console.Write("@");
+                }
+                else if (cola.Contains(x))
+                {
+                    Console.Write("|");
+                }
+                else
+                {
+                    Console.Write(" ");
+                }
+            }
+            Console.WriteLine();
+        }
+    }
+
+
+    static bool EsParteCola(int x, int y)
+    {
+        if (directionX != 0 && y == posicionY && x < posicionX && x >= posicionX - snakeLength)
+        {
+            return true;
+        }
+        return false;
+    }
+
+
+    static void MoverSerpiente()
+    {
+        // Movimiento horizontal
+        posicionX += directionX;
+        // Movimiento vertical
+        posicionY += directionY;
+
+        // Agregar la nueva posición de la cabeza a la cola
+        cola.Insert(0, posicionX);
+
+        // Si la cola es más larga que la longitud de la serpiente, eliminar el último segmento
+        if (cola.Count > snakeLength)
+        {
+            cola.RemoveAt(cola.Count - 1);
+        }
+
+        // Si la serpiente alcanza el borde, hacerla aparecer del otro lado
+        if (posicionX >= tamañoX || posicionX < 0)
+        {
+            posicionX = (posicionX + tamañoX) % tamañoX;
+        }
+        if (posicionY >= tamañoY || posicionY < 0)
+        {
+            posicionY = (posicionY + tamañoY) % tamañoY;
+        }
+    }
+
+    static void InteractuarUsuario()
+    {
+        // Leer la entrada del usuario y actualizar la dirección de la serpiente
+        if (Console.KeyAvailable)
+        {
+            ConsoleKeyInfo tecla = Console.ReadKey(true);
+            if (tecla.Key == ConsoleKey.D)
+            {
+                directionX = 1; // Mover a la derecha
+                directionY = 0; // No mover verticalmente
+            }
+            else if (tecla.Key == ConsoleKey.A)
+            {
+                directionX = -1; // Mover a la izquierda
+                directionY = 0; // No mover verticalmente
+            }
+            else if (tecla.Key == ConsoleKey.W)
+            {
+                directionX = 0; // No mover horizontalmente
+                directionY = -1; // Mover hacia arriba
+            }
+            else if (tecla.Key == ConsoleKey.S)
+            {
+                directionX = 0; // No mover horizontalmente
+                directionY = 1; // Mover hacia abajo
+            }
+            else if (tecla.Key == ConsoleKey.P)
+            {
+                Environment.Exit(0); // Salir del juego si se presiona la tecla P
+            }
+        }
+    }
+}

@@ -1,0 +1,107 @@
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static int tamaño = 25; // Tamaño del tablero
+    static int posicion = 0; // Posición inicial de la serpiente
+    static int puntoPosicion = tamaño / 2; // Posición del punto que contiene el "+"
+    static int direction = 1; // Dirección inicial de la serpiente (1: derecha, -1: izquierda)
+    static int snakeLength = 1; // Longitud inicial de la serpiente
+
+    static List<int> cola = new List<int>(); // Cola de la serpiente
+
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Bienvenido a Snake!");
+        Console.WriteLine("Utiliza las teclas A y D para mover la serpiente.");
+        Console.WriteLine("Presiona Q para salir.");
+        Console.ReadKey();
+        // Bucle principal del juego
+        while (true)
+        {
+            DibujarTablero();
+            MoverSerpiente();
+            InteractuarUsuario();
+            System.Threading.Thread.Sleep(239); // Esperar un tiempo para simular la velocidad del juego
+        }
+    }
+
+    static void DibujarTablero()
+    {
+        Console.Clear();
+        for (int i = 0; i < tamaño; i++)
+        {
+            if (i == puntoPosicion)
+            {
+                Console.Write("+");
+            }
+            else if (i == posicion)
+            {
+                Console.Write("@");
+            }
+            else if (cola.Contains(i))
+            {
+                Console.Write("-");
+            }
+            else
+            {
+                Console.Write(" ");
+            }
+        }
+    }
+
+    static void MoverSerpiente()
+    {
+        // Agregar un nuevo segmento a la cola
+        cola.Insert(0, posicion);
+
+        // Si la cola es más larga que la longitud de la serpiente, eliminar el último segmento
+        if (cola.Count > snakeLength)
+        {
+            cola.RemoveAt(cola.Count - 1);
+        }
+
+        posicion += direction;
+
+        // Si la serpiente alcanza el borde, cambiar de dirección y ajustar la cola
+        if (posicion >= tamaño || posicion < 0)
+        {
+            direction *= -1;
+            posicion += direction * 2;
+
+            // Invertir la dirección de la cola
+            for (int i = 0; i < cola.Count; i++)
+            {
+                cola[i] += direction;
+            }
+        }
+
+        // Si la serpiente pasa por el "+", aumentar su longitud
+        if (posicion == puntoPosicion)
+        {
+            snakeLength++;
+        }
+    }
+
+    static void InteractuarUsuario()
+    {
+        // Leer la entrada del usuario y actualizar la dirección de la serpiente
+        if (Console.KeyAvailable)
+        {
+            ConsoleKeyInfo tecla = Console.ReadKey(true);
+            if (tecla.Key == ConsoleKey.D)
+            {
+                direction = 1; // Mover a la derecha
+            }
+            else if (tecla.Key == ConsoleKey.A)
+            {
+                direction = -1; // Mover a la izquierda
+            }
+            else if (tecla.Key == ConsoleKey.P)
+            {
+                Environment.Exit(0); // Salir del juego si se presiona la tecla P
+            }
+        }
+    }
+}

@@ -1,0 +1,210 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime;
+
+class Program
+{
+    static int tamañoX = 25;
+    static int tamañoY = 25;
+    static int posicionX = tamañoX / 2;
+    static int posicionY = tamañoY / 2;
+    static int puntoPosicionX = tamañoX / 2;
+    static int puntoPosicionY = tamañoY / 2;
+    static int directionX = 1;
+    static int directionY = 0;
+    static int snakeLength = 1;
+    static List<(int x, int y)> cola = new List<(int, int)>();
+    static List<(int x, int y)> posicionesVisitadas = new List<(int, int)>();
+    static void Main(string[] args)
+    {
+        Console.WriteLine("╔═══════════════════════════════════════════════════════════╗");
+        Console.WriteLine("║                    ¡Bienvenido a Snake!                   ║");
+        Console.WriteLine("║                                                           ║");
+        Console.WriteLine("║  Utiliza las teclas A, D, W y S para mover la serpiente.  ║");
+        Console.WriteLine("║                                                           ║");
+        Console.WriteLine("║                   Presiona Q para salir.                  ║");
+        Console.WriteLine("╚═══════════════════════════════════════════════════════════╝");
+
+        Console.ReadKey();
+
+        while (true)
+        {
+            DibujarTablero();
+            MoverSerpiente();
+            InteractuarUsuario();
+            GuardarRecorrido();
+            System.Threading.Thread.Sleep(10); // Ajusta la velocidad del juego
+        }
+    }
+
+    static void DibujarTablero()
+    {
+        Console.Clear();
+        for (int y = 0; y < tamañoY; y++)
+        {
+            for (int x = 0; x < tamañoX; x++)
+            {
+                if (x == puntoPosicionX && y == puntoPosicionY)
+                {
+                    Console.Write("+");
+                }
+                else if (x == posicionX && y == posicionY)
+                {
+                    Console.Write("@");
+                }
+                else if (cola.Contains((x, y)))
+                {
+                    if (cola.IndexOf((x, y)) == 0)
+                    {
+                        Console.Write("o"); // Cuello de la serpiente
+                    }
+                    else
+                    {
+                        Console.Write("o"); // Cuerpo de la serpiente
+                    }
+                }
+                else
+                {
+                    Console.Write(" ");
+                }
+            }
+            Console.WriteLine();
+        }
+    }
+
+    static void MoverSerpiente()
+    {
+        //guarda las posiciones en una lista
+        posicionesVisitadas.Insert(0, (posicionX, posicionY));
+
+        // Verificar colisión con la cola
+        if (cola.Contains((posicionX, posicionY)))
+        {            
+            MostrarResultadoFinal();
+            return;
+        }
+
+        // Actualiza las coordenadas de la serpiente (cabeza y cola)
+        cola.Insert(0, (posicionX, posicionY));
+        posicionX += directionX;
+        posicionY += directionY;
+
+        // Si la cola es más larga que la longitud de la serpiente, elimina el último segmento
+        if (cola.Count > snakeLength)
+        {
+            cola.RemoveAt(cola.Count - 1);
+        }
+
+        // Verifica si la serpiente ha alcanzado el punto "+"
+        if (posicionX == puntoPosicionX && posicionY == puntoPosicionY)
+        {
+            snakeLength++; // Aumenta la longitud de la serpiente
+            GenerarNuevoPunto(); // Genera un nuevo punto "+"
+        }
+
+        // modulo por que 24 mod 25 el modulo es 24 dejando la nueva posicion 24
+        if (posicionX >= tamañoX || posicionX < 0)
+        {
+            posicionX = (posicionX + tamañoX) % tamañoX;
+        }
+        if (posicionY >= tamañoY || posicionY < 0)
+        {
+            posicionY = (posicionY + tamañoY) % tamañoY;
+        }
+    }
+
+    static void InteractuarUsuario()
+    {
+        if (Console.KeyAvailable)
+        {
+            ConsoleKeyInfo tecla = Console.ReadKey(true);
+            switch (tecla.Key)
+            {
+                case ConsoleKey.D:
+                    directionX = 1; // Mover a la derecha
+                    directionY = 0;
+                    break;
+                case ConsoleKey.A:
+                    directionX = -1; // Mover a la izquierda
+                    directionY = 0;
+                    break;
+                case ConsoleKey.W:
+                    directionX = 0;
+                    directionY = -1; // Mover hacia arriba
+                    break;
+                case ConsoleKey.S:
+                    directionX = 0;
+                    directionY = 1; // Mover hacia abajo
+                    break;
+                case ConsoleKey.Q:
+                    Environment.Exit(0);
+                    break;
+            }
+        }
+    }
+
+    static Random numRandom = new Random();
+    static void GenerarNuevoPunto()
+    {
+        puntoPosicionX = numRandom.Next(0, tamañoX);
+        puntoPosicionY = numRandom.Next(0, tamañoY);
+    }
+        static void MostrarResultadoFinal()
+    {
+        Console.Clear();
+        Console.WriteLine("╔═════════════════════════════════════════════════════════════════════╗");
+        Console.WriteLine("║              ¡La serpiente ha chocado consigo misma!                ║");                   
+        Console.WriteLine("║                                                                     ║");
+        Console.WriteLine("║                       Puntos: "+cola.Count+"                                       ║");
+        Console.WriteLine("║                                                                     ║");
+        Console.WriteLine("║          Segmentos recorridos: "+posicionesVisitadas.Count+"                                ║");
+        Console.WriteLine("║                                                                     ║");
+        Console.WriteLine("║               Presiona cualquier tecla para salir.                  ║");
+        Console.WriteLine("║                                                                     ║");
+        Console.WriteLine("╚═════════════════════════════════════════════════════════════════════╝");
+        Console.ReadKey();
+        Environment.Exit(0);
+    }
+
+    static string rutaArchivo = "C:\\Users\\VICTOR\\OneDrive - Universidad Privada Domingo Savio\\Escritorio\\Progra II\\recorrido_serpiente.txt";
+
+    static void GuardarRecorrido()
+    {
+        // Crear una matriz para representar el tablero
+        char[,] tablero = new char[tamañoY, tamañoX];
+
+        // Inicializar la matriz con espacios en blanco
+        for (int i = 0; i < tamañoY; i++)
+        {
+            for (int j = 0; j < tamañoX; j++)
+            {
+                tablero[i, j] = ' ';
+            }
+        }
+
+        // Marcar las posiciones visitadas por la serpiente con "X"
+        foreach (var posicion in posicionesVisitadas)
+        {
+            tablero[posicion.y, posicion.x] = 'X';
+        }
+
+        // Limpiar el contenido del archivo
+        File.WriteAllText(rutaArchivo, string.Empty);
+
+        // Guardar la matriz en el archivo
+        using (StreamWriter escribidor = new StreamWriter(rutaArchivo, true))
+        {
+            for (int y = 0; y < tamañoY; y++)
+            {
+                for (int x = 0; x < tamañoX; x++)
+                {
+                    escribidor.Write(tablero[y, x]);
+                }
+                escribidor.WriteLine();
+            }
+            escribidor.WriteLine("Puntos: " + cola.Count);
+            escribidor.WriteLine("Posiciones recorridas: " + posicionesVisitadas.Count);
+        }
+    }
+
+}

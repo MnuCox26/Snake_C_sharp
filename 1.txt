@@ -1,0 +1,72 @@
+using System;
+
+class Program
+{
+    static int tamaño = 35; // Tamaño del tablero
+    static int posicion = tamaño / 2; // Posición inicial de la serpiente
+    static int direction = 1; // Dirección inicial de la serpiente (1: derecha, -1: izquierda)
+
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Bienvenido a Snake!");
+        Console.WriteLine("Utiliza las teclas A y D para mover la serpiente.");
+        Console.WriteLine("Presiona Q para salir.");
+        Console.ReadKey();
+        // Bucle principal del juego
+        while (true)
+        {
+            DibujarTablero();
+            MoverSerpiente();
+            InteractuarUsuario();
+            System.Threading.Thread.Sleep(239); // Esperar un tiempo para simular la velocidad del juego
+        }
+    }
+
+    static void DibujarTablero()
+    {
+        Console.Clear();
+        for (int i = 0; i < tamaño; i++)
+        {
+            if (i == posicion)
+            {
+                Console.Write("@-");
+            }
+            else
+            {
+                Console.Write(" ");
+            }
+        }
+    }
+
+    static void MoverSerpiente()
+    {
+        posicion += direction;
+        // Si la serpiente alcanza el borde, cambiar de dirección
+        if (posicion >= tamaño || posicion < 0)
+        {
+            direction *= -1;
+            posicion += direction * 2;
+        }
+    }
+
+    static void InteractuarUsuario()
+    {
+        // Leer la entrada del usuario y actualizar la dirección de la serpiente
+        if (Console.KeyAvailable)
+        {
+            ConsoleKeyInfo key = Console.ReadKey(true);
+            if (key.Key == ConsoleKey.D)
+            {
+                direction = 1; // Mover a la derecha
+            }
+            else if (key.Key == ConsoleKey.A)
+            {
+                direction = -1; // Mover a la izquierda
+            }
+            else if (key.Key == ConsoleKey.P)
+            {
+                Environment.Exit(0); // Salir del juego si se presiona la tecla P
+            }
+        }
+    }
+}
