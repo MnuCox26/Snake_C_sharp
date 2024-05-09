@@ -37,10 +37,7 @@ If you want to contribute to this project, follow these steps:
 5. Open a pull request.
 
 ## Credits
-This project was developed by [your_name].
-
-## License
-[Indicate the license you're using for this project, for example, MIT License.]
+This project was developed by [Victor Cox].
 
 ---
 Spanish -- Español
